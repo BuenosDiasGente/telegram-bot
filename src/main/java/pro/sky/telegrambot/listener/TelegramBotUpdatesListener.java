@@ -23,13 +23,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     @Autowired
     private final NotificationTaskRepository notificationTaskRepository;
 
-    private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
     @Autowired
     private TelegramBot telegramBot;
 
     public static final String MESSAGE_TEXT = "Добро пожаловать! Это планинг-бот:)! Для планирования задачи отправьте её в формате: 01.01.2022 20:00 Сделать домашнюю работу";
-    ;
+
     public static final String MESSAGE_NOTIFICATION = "Напоминание добавленно";
     public static final String MESSAGE_ERROR = "Некорректный формат сообщения!";
 
@@ -55,7 +55,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     SendMessage message = new SendMessage(id, MESSAGE_TEXT);
                     telegramBot.execute(message);
                 } else {
-                    Pattern pattern = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)");
+                    Pattern pattern = Pattern.compile("([0-9.:\\s]{16})(\\s)([\\W+]+)");
                     Matcher matcher = pattern.matcher(value);
                     if (matcher.matches()) {
                         String date = matcher.group(1);
@@ -64,7 +64,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                         NotificationTask notificationTask = new NotificationTask();
                         notificationTask.setChatId(id);
                         notificationTask.setDateAndTime(parse);
-                        notificationTask.setMassage(item);
+                        notificationTask.setMessage(item);
                         notificationTaskRepository.save(notificationTask);
                         SendMessage message = new SendMessage(id, MESSAGE_NOTIFICATION);
                         telegramBot.execute(message);
