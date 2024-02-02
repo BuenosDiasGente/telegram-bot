@@ -10,6 +10,7 @@ import pro.sky.telegrambot.repository.NotificationTaskRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class NotificationTaskTimerScheduled {
@@ -19,13 +20,12 @@ public class NotificationTaskTimerScheduled {
     @Autowired
     private TelegramBot telegramBot;
 
-    @Scheduled(cron = "0 0/1 * * * *")
-
+    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
     public void run() {
         notificationTaskRepository.findAllByNotificationDateTime
                         (LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES))
                 .forEach(notificationTask -> {
-                    SendMessage message = new SendMessage(notificationTask.getChatId(),notificationTask.getMassage());
+                    SendMessage message = new SendMessage(notificationTask.getChatId(), notificationTask.getMessage());
                     telegramBot.execute(message);
                     notificationTaskRepository.delete(notificationTask);
                 });
